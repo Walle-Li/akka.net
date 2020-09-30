@@ -26,7 +26,7 @@ akka {
         dot-netty.tcp {
             port = 8081
             hostname = 0.0.0.0
-            public-hostname = localhost
+            public-hostname = 120.196.118.77
         }
     }
 }
@@ -34,11 +34,30 @@ akka {
 
             using (var system = ActorSystem.Create("MyServer", config))
             {
-                system.ActorOf(Props.Create(() => new ChatServerActor()), "ChatServer");
-
+                IActorRef root = system.ActorOf(Props.Create(() => new ChatServerActor()), "ChatServer");
+                Console.WriteLine(root);
                 Console.ReadLine();
             }
         }
+    }
+
+    class MultiActor : ReceiveActor, ILogReceive
+    {
+        public MultiActor()
+        {
+            Receive<SayRequest>(message =>
+            {
+                var response = new SayResponse
+                {
+                    Username = message.Username,
+                    Text = message.Text,
+                };
+            });
+
+            
+
+        }
+
     }
 
     class ChatServerActor : ReceiveActor, ILogReceive
@@ -49,6 +68,7 @@ akka {
         {
             Receive<SayRequest>(message =>
             {
+                Console.WriteLine($"{Sender} -- saying something");
                 var response = new SayResponse
                 {
                     Username = message.Username,
@@ -60,6 +80,7 @@ akka {
             Receive<ConnectRequest>(message =>
             {
                 _clients.Add(Sender);
+                Console.WriteLine($"{Sender} -- connected");
                 Sender.Tell(new ConnectResponse
                 {
                     Message = "Hello and welcome to Akka.NET chat example",
@@ -68,6 +89,7 @@ akka {
 
             Receive<NickRequest>(message =>
             {
+                Console.WriteLine($"{Sender} -- name chanced");
                 var response = new NickResponse
                 {
                     OldUsername = message.OldUsername,

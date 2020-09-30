@@ -78,7 +78,7 @@ akka {
     class ChatClientActor : ReceiveActor, ILogReceive
     {
         private string _nick = "Roggan";
-        private readonly ActorSelection _server = Context.ActorSelection("akka.tcp://MyServer@localhost:8081/user/ChatServer");
+        private readonly ActorSelection _server = Context.ActorSelection("akka.tcp://MyServer@120.196.118.77:8081/user/ChatServer");
 
         public ChatClientActor()
         {
